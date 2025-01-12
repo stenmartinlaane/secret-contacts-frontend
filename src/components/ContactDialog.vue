@@ -1,16 +1,13 @@
 <script setup lang="ts">
-const props = defineProps({
-  type: {
-    type: String,
-    validator: (value: string) => value === "edit" || value === "add",
-  },
-  onSubmit: {
-    type: Function as PropType<(() => void) | undefined>,
-    default: undefined,
-  },
-});
-import { PropType } from 'vue';
-import { Button } from '../components/ui/button'
+const props = defineProps<{
+  id?: number;
+  type: "add" | "edit";
+  onSubmit:
+    | ((contact: Contact) => Promise<void>)
+    | ((contact: ContactEssentials) => Promise<void>);
+}>();
+import { PropType, ref } from "vue";
+import { Button } from "../components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -19,11 +16,22 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '../components/ui/dialog'
-import { Input } from '../components/ui/input'
-import { Label } from '../components/ui/label'
+} from "../components/ui/dialog";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { ContactEssentials } from "../lib/types";
+import { Contact } from "../lib/validations";
+const name = ref("");
+const codeName = ref("");
+const phoneNumber = ref("");
+
 const actionName = props.type === "edit" ? "Muuda Kontakti" : "Lisa Kontakt";
 const submitButtonName = props.type === "edit" ? "Muuda" : "Lisa";
+
+const handleSubmit = async (contact: ContactEssentials) => {
+  const id = props.id!;
+  await props.onSubmit({ ...contact, id });
+};
 </script>
 
 <template>
@@ -36,36 +44,36 @@ const submitButtonName = props.type === "edit" ? "Muuda" : "Lisa";
     <DialogContent class="sm:max-w-[500px]">
       <DialogHeader>
         <DialogTitle>{{ actionName }}</DialogTitle>
-        <!-- <DialogDescription>
-          Make changes to your profile here. Click save when you're done.
-        </DialogDescription> -->
       </DialogHeader>
-      <form @submit.prevent="props.onSubmit">
-      <div class="grid gap-4 py-4">
-        <div class="grid grid-cols-4 items-center gap-4">
-          <Label for="name" class="text-right">
-            Nimi
-          </Label>
-          <Input id="name" value="Pedro Duarte" class="col-span-3" />
+
+      <form
+        @submit.prevent="
+          handleSubmit({
+            name: name,
+            codeName: codeName,
+            phoneNumber: phoneNumber,
+          })
+        "
+      >
+        <div class="grid gap-4 py-4">
+          <div class="grid grid-cols-4 items-center gap-4">
+            <Label for="name" class="text-right"> Nimi </Label>
+            <Input id="name" v-model="name" class="col-span-3" />
+          </div>
+          <div class="grid grid-cols-4 items-center gap-4">
+            <Label for="codeName" class="text-right"> Kood-nimi </Label>
+            <Input id="codeName" v-model="codeName" class="col-span-3" />
+          </div>
+          <div class="grid grid-cols-4 items-center gap-4">
+            <Label for="phoneNumber" class="text-right"> Telefoninumber </Label>
+            <Input id="phoneNumber" v-model="phoneNumber" class="col-span-3" />
+          </div>
         </div>
-        <div class="grid grid-cols-4 items-center gap-4">
-          <Label for="codeName" class="text-right">
-            Kood-nimi
-          </Label>
-          <Input id="username" value="@peduarte" class="col-span-3" />
-        </div>
-        <div class="grid grid-cols-4 items-center gap-4">
-          <Label for="username" class="text-right">
-            Telefoninumber
-          </Label>
-          <Input id="username" value="@peduarte" class="col-span-3" />
-        </div>
-      </div>
-      <DialogFooter>
-        <Button type="submit">
-          {{ submitButtonName }}
-        </Button>
-      </DialogFooter>
+        <DialogFooter>
+          <Button type="submit">
+            {{ submitButtonName }}
+          </Button>
+        </DialogFooter>
       </form>
     </DialogContent>
   </Dialog>

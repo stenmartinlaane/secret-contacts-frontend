@@ -1,8 +1,118 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from "vue-router";
-import Button from "./components/ui/button/Button.vue";
 import AddContactButton from "./components/AddContactButton.vue";
 import ContactsTable from "./components/ContactsTable.vue";
+import { onMounted, ref, Ref } from "vue";
+import { Contact, contactsSchema, ServerAddResponseSchema, ServerDeleteResponseSchema, ServerUpdateResponseSchema } from "./lib/validations";
+import { ContactEssentials } from "./lib/types";
+
+const contacts: Ref<Contact[]> = ref([
+  // { name: "alex", codeName: "klks", phoneNumber: "20049123321", id: 192 },
+  // { name: "john", codeName: "asdf", phoneNumber: "8248923", id: 192 },
+  // { name: "capek", codeName: "kdadfslks", phoneNumber: "839248239", id: 192 },
+]);
+
+const handleDeleteContact = async(id: number) => {
+  console.log("add")
+  try {
+    const baseUrl = import.meta.env.VITE_API_BASE_URL;
+    const response = await fetch(baseUrl + `/contacts/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to delete data');
+    }
+    const data = await response.json();
+    const parsedData = ServerDeleteResponseSchema.safeParse(data)
+    if (!parsedData.success) {
+      console.log(parsedData.error)
+    }
+    contacts.value = contacts.value.filter(contact => contact.id !== id)
+  } catch (err) {
+    console.log(err)
+  } finally {
+  }
+}
+
+const handleAddContact = async(contact: ContactEssentials) => {
+ console.log("addl")
+ try {
+    const baseUrl = import.meta.env.VITE_API_BASE_URL;
+    const response = await fetch(baseUrl + "/contacts", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(contact)
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch data');
+    }
+    const data = await response.json();
+    const parsedData = ServerAddResponseSchema.safeParse(data)
+    if (!parsedData.success) {
+      console.log(parsedData.error)
+    }
+    contacts.value = [...contacts.value, parsedData.data!.result]
+  } catch (err) {
+    console.log(err)
+  } finally {
+  }
+}
+
+const handleUpdateContact = async(contact: Contact) => {
+  const { id, ...contactWithoutId } = contact;
+  console.log(contactWithoutId)
+  try {
+    const baseUrl = import.meta.env.VITE_API_BASE_URL;
+    const response = await fetch(baseUrl + `/contacts/${id}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(contactWithoutId)
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch data');
+    }
+    const data = await response.json();
+    const parsedData = ServerUpdateResponseSchema.safeParse(data)
+    console.log(data)
+    if (!parsedData.success) {
+      console.log(parsedData.error)
+    }
+    contacts.value = contacts.value.map(c => {
+      if (c.id === contact.id) {
+        return contact;
+      }
+      return c;
+    }); //parsedData.data is never undefined here
+  } catch (err) {
+    console.log(err)
+  } finally {
+  }
+}
+
+onMounted(async () => {
+  try {
+    const baseUrl = import.meta.env.VITE_API_BASE_URL;
+    const response = await fetch(baseUrl + "/contacts");
+    if (!response.ok) {
+      throw new Error('Failed to fetch data');
+    }
+    const data = await response.json();
+    const parsedData = contactsSchema.safeParse(data)
+    if (!parsedData.success) {
+      console.log("Wrong data format")
+    }
+    contacts.value = parsedData.data!; //parsedData.data is never undefined here
+  } catch (err) {
+    console.log(err)
+  } finally {
+  }
+});
 </script>
 
 <template>
@@ -11,9 +121,9 @@ import ContactsTable from "./components/ContactsTable.vue";
   >
     <div class="pt-20">
       <div class="flex gap-40">
-        <AddContactButton></AddContactButton>
+        <AddContactButton :onClick="handleAddContact" ></AddContactButton>
       </div>
-      <ContactsTable></ContactsTable>
+      <ContactsTable :contacts="contacts" :handleDeleteContact="handleDeleteContact" :handleUpdateContact="handleUpdateContact" ></ContactsTable>
     </div>
   </div>
 </template>

@@ -4,7 +4,7 @@ import type {
   SortingState,
   ColumnFiltersState,
 } from "@tanstack/vue-table";
-import { h, ref } from "vue";
+import { h, ref, watch } from "vue";
 import { Input } from "../ui/input";
 import {
   Table,
@@ -23,18 +23,22 @@ import {
   getSortedRowModel,
   useVueTable,
 } from "@tanstack/vue-table";
+import { Contact } from "../../lib/validations";
 
 const props = defineProps<{
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
+  columns: ColumnDef<Contact, TValue>[];
+  data: Contact[];
+  setFilteredData: (data: Contact[]) => void;
 }>();
 
 const sorting = ref<SortingState>([]);
 const columnFilters = ref<ColumnFiltersState>([]);
+const seachText = ref('123')
+const filtreredData = ref(props.data)
 
-const table = useVueTable({
+const table = useVueTable<Contact>({
   get data() {
-    return props.data;
+    return filtreredData;
   },
   get columns() {
     return props.columns;
@@ -54,6 +58,13 @@ const table = useVueTable({
     },
   },
 });
+watch(seachText, (newSearchText) => {
+  const text = newSearchText.toLowerCase();
+  filtreredData.value = props.data.filter(c => c.name.toLowerCase().includes(text) || c.phoneNumber.toLowerCase().includes(text) || c.codeName.toLowerCase().includes(text))
+});
+const test = (newSearchText: string) => {
+  seachText.value = newSearchText; // Manually update seachText when the input changes
+};
 </script>
 
 <template>
@@ -62,9 +73,10 @@ const table = useVueTable({
       <Input
         class="max-w-sm bg-white/40 outline-none transition focus:bg-white/80 : hover:bg-white/60 placeholder:text-black/70"
         placeholder="Otsi kontakte..."
-        :model-value="table.getColumn('name')?.getFilterValue() as string"
-        @update:model-value="table.getColumn('name')?.setFilterValue($event)"
+        v-model="seachText"
       />
+        <!-- :model-value="table.getColumn('name')?.getFilterValue() as string"
+        @update:model-value="table.getColumn('name')?.setFilterValue($event)" -->
     </div>
 
     <div class="border rounded-md">
@@ -101,7 +113,8 @@ const table = useVueTable({
           <template v-else>
             <TableRow>
               <TableCell :colspan="columns.length" class="h-24 text-center">
-                No results.
+                Kontaktid puuduvad. Vajuta nuppu "Lisa Kontakt", et lisada uus
+                kontakt.
               </TableCell>
             </TableRow>
           </template>

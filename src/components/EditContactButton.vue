@@ -4,34 +4,16 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  handleUpdateContact: {
+    type: Function as PropType<(contact: Contact) => Promise<void>>,
+    required: true,
+  },
 });
+import { PropType } from "vue";
 import ContactDialog from "./ContactDialog.vue";
-const handleSubmit = async () => {
-  console.log(props.id)
-  try {
-    let data = {}
-    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/delete/${id}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to make POST request');
-    }
-
-    const result = await response.json();
-    // postData.value = result; // Store the response
-    console.log('Post request successful:', result);
-  } catch (error) {
-    console.error('Error with POST request:', error);
-  }
-}
+import { Contact } from "../lib/validations";
 </script>
 
 <template>
-  <ContactDialog type="edit" :onSubmit="handleSubmit"></ContactDialog>
+  <ContactDialog type="edit" :onSubmit="props.handleUpdateContact" :id="props.id"></ContactDialog>
 </template>
-
