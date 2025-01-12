@@ -4,7 +4,7 @@ import type {
   SortingState,
   ColumnFiltersState,
 } from "@tanstack/vue-table";
-import { h, ref, watch } from "vue";
+import { computed, h, ref, watch } from "vue";
 import { Input } from "../ui/input";
 import {
   Table,
@@ -28,17 +28,27 @@ import { Contact } from "../../lib/validations";
 const props = defineProps<{
   columns: ColumnDef<Contact, TValue>[];
   data: Contact[];
-  setFilteredData: (data: Contact[]) => void;
 }>();
 
 const sorting = ref<SortingState>([]);
 const columnFilters = ref<ColumnFiltersState>([]);
-const seachText = ref('123')
-const filtreredData = ref(props.data)
+const searchText = ref("");
+const filteredData = computed(() => {
+  if (searchText.value.trim() === "") {
+    return props.data;
+  }
+  const text = searchText.value.toLowerCase();
+  return props.data.filter(
+    (c) =>
+      c.name.toLowerCase().includes(text) ||
+      c.phoneNumber.toLowerCase().includes(text) ||
+      c.codeName.toLowerCase().includes(text)
+  );
+});
 
 const table = useVueTable<Contact>({
   get data() {
-    return filtreredData;
+    return filteredData;
   },
   get columns() {
     return props.columns;
@@ -58,12 +68,8 @@ const table = useVueTable<Contact>({
     },
   },
 });
-watch(seachText, (newSearchText) => {
-  const text = newSearchText.toLowerCase();
-  filtreredData.value = props.data.filter(c => c.name.toLowerCase().includes(text) || c.phoneNumber.toLowerCase().includes(text) || c.codeName.toLowerCase().includes(text))
-});
 const test = (newSearchText: string) => {
-  seachText.value = newSearchText; // Manually update seachText when the input changes
+  searchText.value = newSearchText; // Manually update seachText when the input changes
 };
 </script>
 
@@ -73,14 +79,14 @@ const test = (newSearchText: string) => {
       <Input
         class="max-w-sm bg-white/40 outline-none transition focus:bg-white/80 : hover:bg-white/60 placeholder:text-black/70"
         placeholder="Otsi kontakte..."
-        v-model="seachText"
+        v-model="searchText"
       />
-        <!-- :model-value="table.getColumn('name')?.getFilterValue() as string"
+      <!-- :model-value="table.getColumn('name')?.getFilterValue() as string"
         @update:model-value="table.getColumn('name')?.setFilterValue($event)" -->
     </div>
 
     <div class="border rounded-md">
-      <Table>
+      <Table >
         <TableHeader>
           <TableRow
             v-for="headerGroup in table.getHeaderGroups()"

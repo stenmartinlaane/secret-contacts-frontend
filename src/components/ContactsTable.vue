@@ -2,13 +2,13 @@
 const props = defineProps<{
   contacts: Contact[];
   handleDeleteContact: (id: number) => Promise<void>;
-  handleUpdateContact: (contact: Contact) => Promise<void>
+  handleUpdateContact: (contact: Contact) => Promise<void>;
 }>();
 import { onMounted, PropType, Ref, ref } from "vue";
 import { Contact } from "../lib/validations";
 import { columns } from "./contacts/columns";
 import DataTable from "./contacts/data-table.vue";
-const filteredContacts = ref(props.contacts)
+const filteredContacts = ref(props.contacts);
 const setFilteredData = (data: Contact[]) => {
   filteredContacts.value = data;
 };
@@ -19,5 +19,9 @@ const tableColumns = columns(
 </script>
 
 <template>
-  <DataTable :columns="tableColumns" :data="props.contacts" :setFilteredData="setFilteredData" />
+  <DataTable
+    :columns="tableColumns"
+    :data="props.contacts"
+    :setFilteredData="setFilteredData"
+  />
 </template>

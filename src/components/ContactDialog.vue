@@ -2,6 +2,7 @@
 const props = defineProps<{
   id?: number;
   type: "add" | "edit";
+  contact?: ContactEssentials;
   onSubmit:
     | ((contact: Contact) => Promise<void>)
     | ((contact: ContactEssentials) => Promise<void>);
@@ -12,6 +13,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogClose,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -20,10 +22,11 @@ import {
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { ContactEssentials } from "../lib/types";
-import { Contact } from "../lib/validations";
-const name = ref("");
-const codeName = ref("");
-const phoneNumber = ref("");
+import { Contact, contactSchema } from "../lib/validations";
+const contact = props.contact;
+const name = ref(contact ? contact.name : "");
+const codeName = ref(contact ? contact.codeName : "");
+const phoneNumber = ref(contact ? contact.phoneNumber : "");
 
 const actionName = props.type === "edit" ? "Muuda Kontakti" : "Lisa Kontakt";
 const submitButtonName = props.type === "edit" ? "Muuda" : "Lisa";
@@ -70,9 +73,11 @@ const handleSubmit = async (contact: ContactEssentials) => {
           </div>
         </div>
         <DialogFooter>
-          <Button type="submit">
-            {{ submitButtonName }}
-          </Button>
+          <DialogClose as-child>
+            <Button type="submit">
+              {{ submitButtonName }}
+            </Button>
+          </DialogClose>
         </DialogFooter>
       </form>
     </DialogContent>

@@ -8,9 +8,6 @@ const props = defineProps({
 import { PropType } from "vue";
 import { ContactEssentials } from "../lib/types";
 import ContactDialog from "./ContactDialog.vue";
-const handleSubmit = () => {
-  console.log("Adding contact");
-};
 </script>
 
 <template>

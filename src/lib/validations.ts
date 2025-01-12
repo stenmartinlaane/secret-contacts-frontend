@@ -4,8 +4,8 @@ export const contactSchema = z.object({
   name: z.string(),
   codeName: z.string(),
   phoneNumber: z.string(),
-  id: z.number()
-})
+  id: z.number(),
+});
 
 export const contactsSchema = z.array(contactSchema);
 

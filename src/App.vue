@@ -2,114 +2,122 @@
 import AddContactButton from "./components/AddContactButton.vue";
 import ContactsTable from "./components/ContactsTable.vue";
 import { onMounted, ref, Ref } from "vue";
-import { Contact, contactsSchema, ServerAddResponseSchema, ServerDeleteResponseSchema, ServerUpdateResponseSchema } from "./lib/validations";
+import {
+  Contact,
+  contactsSchema,
+  ServerAddResponseSchema,
+  ServerDeleteResponseSchema,
+  ServerUpdateResponseSchema,
+} from "./lib/validations";
 import { ContactEssentials } from "./lib/types";
+import { toast } from "vue3-toastify";
+// import 'vue3-toastify/dist/index.css';
 
-const contacts: Ref<Contact[]> = ref([
-  // { name: "alex", codeName: "klks", phoneNumber: "20049123321", id: 192 },
-  // { name: "john", codeName: "asdf", phoneNumber: "8248923", id: 192 },
-  // { name: "capek", codeName: "kdadfslks", phoneNumber: "839248239", id: 192 },
-]);
+const contacts: Ref<Contact[]> = ref([]);
 
-const handleDeleteContact = async(id: number) => {
-  console.log("add")
+const handleDeleteContact = async (id: number) => {
   try {
     const baseUrl = import.meta.env.VITE_API_BASE_URL;
     const response = await fetch(baseUrl + `/contacts/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
     if (!response.ok) {
-      throw new Error('Failed to delete data');
+      toast("Kontakti kustutamine ei õnnestunud.", { type: toast.TYPE.ERROR });
+      return;
     }
     const data = await response.json();
-    const parsedData = ServerDeleteResponseSchema.safeParse(data)
+    const parsedData = ServerDeleteResponseSchema.safeParse(data);
     if (!parsedData.success) {
-      console.log(parsedData.error)
+      console.log("")
     }
-    contacts.value = contacts.value.filter(contact => contact.id !== id)
+    toast("Kontakt kustutatud.", { type: toast.TYPE.SUCCESS });
+    contacts.value = contacts.value.filter((contact) => contact.id !== id);
   } catch (err) {
-    console.log(err)
+    console.log(err);
   } finally {
   }
-}
+};
 
-const handleAddContact = async(contact: ContactEssentials) => {
- console.log("addl")
- try {
+const handleAddContact = async (contact: ContactEssentials) => {
+  try {
     const baseUrl = import.meta.env.VITE_API_BASE_URL;
     const response = await fetch(baseUrl + "/contacts", {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(contact)
+      body: JSON.stringify(contact),
     });
     if (!response.ok) {
-      throw new Error('Failed to fetch data');
+      toast("Kontakti lisamine ei õnnestunud.", { type: toast.TYPE.ERROR });
+      return;
     }
     const data = await response.json();
-    const parsedData = ServerAddResponseSchema.safeParse(data)
+    const parsedData = ServerAddResponseSchema.safeParse(data);
     if (!parsedData.success) {
-      console.log(parsedData.error)
+      console.log(parsedData.error);
     }
-    contacts.value = [...contacts.value, parsedData.data!.result]
+    toast("Kontakt lisatud.", { type: toast.TYPE.SUCCESS });
+    contacts.value = [...contacts.value, parsedData.data!.result];
   } catch (err) {
-    console.log(err)
+    console.log(err);
   } finally {
   }
-}
+};
 
-const handleUpdateContact = async(contact: Contact) => {
+const handleUpdateContact = async (contact: Contact) => {
   const { id, ...contactWithoutId } = contact;
-  console.log(contactWithoutId)
+  console.log(contactWithoutId);
   try {
     const baseUrl = import.meta.env.VITE_API_BASE_URL;
     const response = await fetch(baseUrl + `/contacts/${id}`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(contactWithoutId)
+      body: JSON.stringify(contactWithoutId),
     });
     if (!response.ok) {
-      throw new Error('Failed to fetch data');
+      toast("Kontakti uuendamine ei õnnestunud.", { type: toast.TYPE.ERROR });
+      return;
     }
     const data = await response.json();
-    const parsedData = ServerUpdateResponseSchema.safeParse(data)
-    console.log(data)
+    const parsedData = ServerUpdateResponseSchema.safeParse(data);
+    console.log(data);
     if (!parsedData.success) {
-      console.log(parsedData.error)
+      console.log(parsedData.error);
     }
-    contacts.value = contacts.value.map(c => {
+    toast("Kontakt uuendatud.", { type: toast.TYPE.SUCCESS });
+    contacts.value = contacts.value.map((c) => {
       if (c.id === contact.id) {
         return contact;
       }
       return c;
     }); //parsedData.data is never undefined here
   } catch (err) {
-    console.log(err)
+    console.log(err);
   } finally {
   }
-}
+};
 
 onMounted(async () => {
   try {
     const baseUrl = import.meta.env.VITE_API_BASE_URL;
     const response = await fetch(baseUrl + "/contacts");
     if (!response.ok) {
-      throw new Error('Failed to fetch data');
+      throw new Error("Failed to fetch data");
     }
     const data = await response.json();
-    const parsedData = contactsSchema.safeParse(data)
+    const parsedData = contactsSchema.safeParse(data);
     if (!parsedData.success) {
-      console.log("Wrong data format")
+      console.log("Wrong data format");
     }
     contacts.value = parsedData.data!; //parsedData.data is never undefined here
   } catch (err) {
-    console.log(err)
+    console.log(err);
   } finally {
   }
 });
@@ -117,13 +125,18 @@ onMounted(async () => {
 
 <template>
   <div
-    class="text-zinc-900 bg-[#e5e8ec] max-w-[1050px] mx-auto px-4 flex flex-col min-h-screen"
+    class="text-zinc-900 bg-[#f2f4f6] max-w-[1050px] mx-auto px-4 flex flex-col min-h-screen"
   >
-    <div class="pt-20">
+    <h1 class="text-6xl p-8 text-center">Secret Contacts</h1>
+    <div class="pt-5">
       <div class="flex gap-40">
-        <AddContactButton :onClick="handleAddContact" ></AddContactButton>
+        <AddContactButton :onClick="handleAddContact"></AddContactButton>
       </div>
-      <ContactsTable :contacts="contacts" :handleDeleteContact="handleDeleteContact" :handleUpdateContact="handleUpdateContact" ></ContactsTable>
+      <ContactsTable
+        :contacts="contacts"
+        :handleDeleteContact="handleDeleteContact"
+        :handleUpdateContact="handleUpdateContact"
+      ></ContactsTable>
     </div>
   </div>
 </template>

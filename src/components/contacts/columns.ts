@@ -44,6 +44,7 @@ export const columns = (handleDelete: (id: number) => Promise<void>, handleUpdat
       return h("div", { class: "text-right font-medium flex gap-4 justify-end" }, [
         h(EditContactButton, {
           id,
+          contact: {name: row.getValue("name") as string, phoneNumber: row.getValue("phoneNumber") as string, codeName: row.getValue("codeName") as string},
           handleUpdateContact: handleUpdate, // Passing handleUpdate to EditContactButton
         }),
         h(DeleteContactButton, {
