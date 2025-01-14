@@ -29,7 +29,5 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
-  define: {
-    VITE_API_BASE_URL:`"${process.env.VITE_API_BASE_URL}"`
-  }
+
 })

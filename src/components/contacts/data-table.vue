@@ -1,10 +1,10 @@
-<script setup lang="ts" generic="TData, TValue">
+<script setup lang="ts">
 import type {
   ColumnDef,
   SortingState,
   ColumnFiltersState,
 } from "@tanstack/vue-table";
-import { computed, h, ref, watch } from "vue";
+import { computed, ref } from "vue";
 import { Input } from "../ui/input";
 import {
   Table,
@@ -18,16 +18,17 @@ import { valueUpdater } from "../../lib/utils";
 import {
   FlexRender,
   getCoreRowModel,
-  getPaginationRowModel,
   getFilteredRowModel,
   getSortedRowModel,
   useVueTable,
 } from "@tanstack/vue-table";
 import { Contact } from "../../lib/validations";
+import Button from "../ui/button/Button.vue";
 
 const props = defineProps<{
-  columns: ColumnDef<Contact, TValue>[];
+  columns: ColumnDef<Contact>[];
   data: Contact[];
+  loadingStatus: "loading" | "failed" | "finished";
 }>();
 
 const sorting = ref<SortingState>([]);
@@ -68,8 +69,9 @@ const table = useVueTable<Contact>({
     },
   },
 });
-const test = (newSearchText: string) => {
-  searchText.value = newSearchText; // Manually update seachText when the input changes
+
+const reload = () => {
+  window.location.reload();
 };
 </script>
 
@@ -81,12 +83,10 @@ const test = (newSearchText: string) => {
         placeholder="Otsi kontakte..."
         v-model="searchText"
       />
-      <!-- :model-value="table.getColumn('name')?.getFilterValue() as string"
-        @update:model-value="table.getColumn('name')?.setFilterValue($event)" -->
     </div>
 
     <div class="border rounded-md">
-      <Table >
+      <Table>
         <TableHeader>
           <TableRow
             v-for="headerGroup in table.getHeaderGroups()"
@@ -116,11 +116,26 @@ const test = (newSearchText: string) => {
               </TableCell>
             </TableRow>
           </template>
-          <template v-else>
+          <template v-else-if="loadingStatus === 'finished'">
             <TableRow>
               <TableCell :colspan="columns.length" class="h-24 text-center">
-                Kontaktid puuduvad. Vajuta nuppu "Lisa Kontakt", et lisada uus
+                Kontaktid puuduvad. Vajuta nuppu "Lisa kontakt", et lisada uus
                 kontakt.
+              </TableCell>
+            </TableRow>
+          </template>
+          <template v-else-if="loadingStatus === 'failed'">
+            <TableRow class="text-center w-full">
+              <TableCell :colspan="columns.length" class="h-24 text-center">
+                <p class="pb-2">Ühenduse loomine serveriga ebaõnnestus.</p>
+                <Button @click="reload">Proovi uuesti</Button>
+              </TableCell>
+            </TableRow>
+          </template>
+          <template v-else-if="loadingStatus === 'loading'">
+            <TableRow>
+              <TableCell :colspan="columns.length" class="h-24 text-center">
+                Andmebaasiga ühenduse loomine.
               </TableCell>
             </TableRow>
           </template>

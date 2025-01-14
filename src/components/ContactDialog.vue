@@ -7,12 +7,11 @@ const props = defineProps<{
     | ((contact: Contact) => Promise<void>)
     | ((contact: ContactEssentials) => Promise<void>);
 }>();
-import { PropType, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { Button } from "../components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogClose,
   DialogFooter,
   DialogHeader,
@@ -22,18 +21,41 @@ import {
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { ContactEssentials } from "../lib/types";
-import { Contact, contactSchema } from "../lib/validations";
-const contact = props.contact;
-const name = ref(contact ? contact.name : "");
-const codeName = ref(contact ? contact.codeName : "");
-const phoneNumber = ref(contact ? contact.phoneNumber : "");
+import { Contact } from "../lib/validations";
+const name = ref("");
+const codeName = ref("");
+const phoneNumber = ref("");
+const errorMessage = computed(() => {
+  if (name.value || codeName.value || phoneNumber.value) {
+    return "";
+  }
+  return "Vähemalt üks väli peab olema täidetud!";
+});
+const error = computed(() => {
+  return errorMessage.value !== "";
+});
 
-const actionName = props.type === "edit" ? "Muuda Kontakti" : "Lisa Kontakt";
+watch(
+  () => props.contact,
+  (newContact) => {
+    if (newContact) {
+      name.value = newContact.name;
+      codeName.value = newContact.codeName;
+      phoneNumber.value = newContact.phoneNumber;
+    }
+  },
+  { immediate: true }
+);
+
+const actionName = props.type === "edit" ? "Muuda kontakti" : "Lisa kontakt";
 const submitButtonName = props.type === "edit" ? "Muuda" : "Lisa";
 
 const handleSubmit = async (contact: ContactEssentials) => {
   const id = props.id!;
   await props.onSubmit({ ...contact, id });
+  name.value = "";
+  codeName.value = "";
+  phoneNumber.value = "";
 };
 </script>
 
@@ -60,7 +82,7 @@ const handleSubmit = async (contact: ContactEssentials) => {
       >
         <div class="grid gap-4 py-4">
           <div class="grid grid-cols-4 items-center gap-4">
-            <Label for="name" class="text-right"> Nimi </Label>
+            <Label for="name" class="text-right"> Pärisnimi </Label>
             <Input id="name" v-model="name" class="col-span-3" />
           </div>
           <div class="grid grid-cols-4 items-center gap-4">
@@ -74,7 +96,7 @@ const handleSubmit = async (contact: ContactEssentials) => {
         </div>
         <DialogFooter>
           <DialogClose as-child>
-            <Button type="submit">
+            <Button type="submit" :disabled="error">
               {{ submitButtonName }}
             </Button>
           </DialogClose>

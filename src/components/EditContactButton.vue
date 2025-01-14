@@ -4,7 +4,6 @@ const props = defineProps<{
   handleUpdateContact: (contact: Contact) => Promise<void>;
   contact: ContactEssentials;
 }>();
-import { PropType } from "vue";
 import ContactDialog from "./ContactDialog.vue";
 import { Contact } from "../lib/validations";
 import { ContactEssentials } from "../lib/types";
@@ -15,6 +14,6 @@ import { ContactEssentials } from "../lib/types";
     type="edit"
     :onSubmit="props.handleUpdateContact"
     :id="props.id"
-    :contact="contact"
+    :contact="props.contact"
   ></ContactDialog>
 </template>

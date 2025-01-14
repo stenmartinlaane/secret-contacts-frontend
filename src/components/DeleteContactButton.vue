@@ -1,13 +1,4 @@
 <script setup lang="ts">
-// const props = defineProps({
-//   id: {
-//     type: Number,
-//     required: true,
-//   },
-//   handleDeleteContact: {
-//     type: Function as PropType<(id: number) => Promise<void>>,
-//   },
-// });
 const props = defineProps<{
   id: number;
   handleDeleteContact: (id: number) => Promise<void>;

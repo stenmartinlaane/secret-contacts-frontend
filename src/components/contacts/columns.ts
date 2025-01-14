@@ -1,19 +1,29 @@
-import type { Contact } from "@/lib/validations";
+import type { Contact } from "../../lib/validations";
 import { h } from "vue";
 import type { ColumnDef } from "@tanstack/vue-table";
-import { ArrowUpDown, ChevronDown } from 'lucide-vue-next'
-import { Button } from '@/components/ui/button'
+import { ArrowUpDown } from "lucide-vue-next";
+import { Button } from "@/components/ui/button";
 import DeleteContactButton from "../DeleteContactButton.vue";
 import EditContactButton from "../EditContactButton.vue";
 
-export const columns = (handleDelete: (id: number) => Promise<void>, handleUpdate: (contact: Contact) => Promise<void>): ColumnDef<Contact>[] => [
+export const columns = (
+  handleDelete: (id: number) => Promise<void>,
+  handleUpdate: (contact: Contact) => Promise<void>
+): ColumnDef<Contact>[] => [
   {
     accessorKey: "name",
     header: ({ column }) => {
-      return h(Button, {
-          variant: 'ghost',
-          onClick: () => column.toggleSorting(column.getIsSorted() === 'asc'),
-      }, () => ['Nimi', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })])
+      return h(
+        Button,
+        {
+          variant: "ghost",
+          onClick: () => column.toggleSorting(column.getIsSorted() === "asc"),
+        },
+        () => [
+          h("span", { class: "font-bold text-black" }, "Pärisnimi"),
+          h(ArrowUpDown, { class: "ml-2 h-4 w-4 text-black" }),
+        ]
+      );
     },
     cell: ({ row }) => {
       const name: string = row.getValue("name");
@@ -22,36 +32,45 @@ export const columns = (handleDelete: (id: number) => Promise<void>, handleUpdat
   },
   {
     accessorKey: "codeName",
-    header: () => h("div", { class: "text-right" }, "Kood-nimi"),
+    header: () => h("div", { class: "text-left font-bold text-black" }, "Kood-nimi"),
     cell: ({ row }) => {
       const codeName: string = row.getValue("codeName");
-      return h("div", { class: "text-right font-medium" }, codeName);
+      return h("div", { class: "text-left font-medium" }, codeName);
     },
   },
   {
     accessorKey: "phoneNumber",
-    header: () => h("div", { class: "text-right" }, "Telefoninumber"),
+    header: () => h("div", { class: "text-left font-bold text-black"  }, "Telefoninumber"),
     cell: ({ row }) => {
       const phoneNumber: string = row.getValue("phoneNumber");
-      return h("div", { class: "text-right font-medium" }, phoneNumber);
+      return h("div", { class: "text-left font-medium" }, phoneNumber);
     },
   },
   {
     accessorKey: "id",
-    header: () => h("div", { class: "text-right" }, "Toimingud"),
+    header: () => h("div", { class: "text-right font-bold text-black" }, "Toimingud"),
+    size: 100,
     cell: ({ row }) => {
       const id: number = row.getValue("id");
-      return h("div", { class: "text-right font-medium flex gap-4 justify-end" }, [
-        h(EditContactButton, {
-          id,
-          contact: {name: row.getValue("name") as string, phoneNumber: row.getValue("phoneNumber") as string, codeName: row.getValue("codeName") as string},
-          handleUpdateContact: handleUpdate, // Passing handleUpdate to EditContactButton
-        }),
-        h(DeleteContactButton, {
-          id,
-          handleDeleteContact: handleDelete, // Passing handleDelete to DeleteContactButton
-        }),
-      ]);
+      return h(
+        "div",
+        { class: "text-center font-medium flex gap-4 justify-end" },
+        [
+          h(EditContactButton, {
+            id,
+            contact: {
+              name: row.getValue("name") as string,
+              phoneNumber: row.getValue("phoneNumber") as string,
+              codeName: row.getValue("codeName") as string,
+            },
+            handleUpdateContact: handleUpdate,
+          }),
+          h(DeleteContactButton, {
+            id,
+            handleDeleteContact: handleDelete,
+          }),
+        ]
+      );
     },
   },
-];
+] as ColumnDef<Contact>[];
