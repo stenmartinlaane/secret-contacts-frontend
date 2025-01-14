@@ -29,6 +29,11 @@ export const columns = (
       const name: string = row.getValue("name");
       return h("div", { class: "text-left font-medium" }, name);
     },
+    sortingFn: (rowA, rowB, columnId) => {
+      const nameA = (rowA.getValue("name") as string)?.toLowerCase() || "";
+      const nameB = (rowB.getValue("name") as string)?.toLowerCase() || "";
+      return nameA.localeCompare(nameB);
+    },
   },
   {
     accessorKey: "codeName",

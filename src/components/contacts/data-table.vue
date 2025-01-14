@@ -1,4 +1,9 @@
 <script setup lang="ts">
+const props = defineProps<{
+  columns: ColumnDef<Contact>[];
+  data: Contact[];
+  loadingStatus: "loading" | "failed" | "finished";
+}>();
 import type {
   ColumnDef,
   SortingState,
@@ -24,12 +29,6 @@ import {
 } from "@tanstack/vue-table";
 import { Contact } from "../../lib/validations";
 import Button from "../ui/button/Button.vue";
-
-const props = defineProps<{
-  columns: ColumnDef<Contact>[];
-  data: Contact[];
-  loadingStatus: "loading" | "failed" | "finished";
-}>();
 
 const sorting = ref<SortingState>([]);
 const columnFilters = ref<ColumnFiltersState>([]);

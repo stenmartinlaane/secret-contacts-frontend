@@ -1,13 +1,13 @@
 <script setup lang="ts">
+import { PropType } from "vue";
+import { ContactEssentials } from "../lib/types";
+import ContactDialog from "./ContactDialog.vue";
 const props = defineProps({
   onClick: {
     type: Function as PropType<(contact: ContactEssentials) => Promise<void>>,
     required: true,
   },
 });
-import { PropType } from "vue";
-import { ContactEssentials } from "../lib/types";
-import ContactDialog from "./ContactDialog.vue";
 </script>
 
 <template>
