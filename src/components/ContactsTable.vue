@@ -6,7 +6,7 @@ const props = defineProps<{
   loadingStatus: "loading" | "failed" | "finished";
 }>();
 import { ref } from "vue";
-import { Contact } from "../lib/validations";
+import { Contact } from "../lib/types";
 import { columns } from "./contacts/columns";
 import DataTable from "./contacts/data-table.vue";
 const tableColumns = columns(

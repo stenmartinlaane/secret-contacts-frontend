@@ -5,7 +5,7 @@ const props = defineProps<{
   contact: ContactEssentials;
 }>();
 import ContactDialog from "./ContactDialog.vue";
-import { Contact } from "../lib/validations";
+import { Contact } from "../lib/types";
 import { ContactEssentials } from "../lib/types";
 </script>
 

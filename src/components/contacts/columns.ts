@@ -1,4 +1,4 @@
-import type { Contact } from "../../lib/validations";
+import type { Contact } from "../../lib/types";
 import { h } from "vue";
 import type { ColumnDef } from "@tanstack/vue-table";
 import { ArrowUpDown } from "lucide-vue-next";
@@ -54,7 +54,6 @@ export const columns = (
   {
     accessorKey: "id",
     header: () => h("div", { class: "text-right font-bold text-black" }, "Toimingud"),
-    size: 100,
     cell: ({ row }) => {
       const id: number = row.getValue("id");
       return h(

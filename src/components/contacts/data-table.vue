@@ -27,7 +27,7 @@ import {
   getSortedRowModel,
   useVueTable,
 } from "@tanstack/vue-table";
-import { Contact } from "../../lib/validations";
+import { Contact } from "../../lib/types";
 import Button from "../ui/button/Button.vue";
 
 const sorting = ref<SortingState>([]);

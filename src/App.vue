@@ -2,7 +2,7 @@
 import AddContactButton from "./components/AddContactButton.vue";
 import ContactsTable from "./components/ContactsTable.vue";
 import { onMounted, ref, Ref } from "vue";
-import { Contact } from "./lib/validations";
+import { Contact } from "./lib/types";
 
 import {
   addContactToDatabase,

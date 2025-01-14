@@ -1,15 +1,10 @@
 import { toast } from "vue3-toastify";
-import type { ApiCallResult, ContactEssentials } from "./types";
+import type { ApiCallResult, Contact, ContactEssentials, ServerAddResponse, ServerDeleteResponse, ServerResponse, ServerUpdateResponse } from "./types";
 import {
   ContactsSchema,
   ServerAddResponseSchema,
   ServerDeleteResponseSchema,
   ServerUpdateResponseSchema,
-  type Contact,
-  type ServerAddResponse,
-  type ServerDeleteResponse,
-  type ServerResponse,
-  type ServerUpdateResponse,
 } from "./validations";
 
 class ApiCallResultFactory<T> {

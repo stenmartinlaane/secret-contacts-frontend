@@ -21,7 +21,7 @@ import {
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { ContactEssentials } from "../lib/types";
-import { Contact } from "../lib/validations";
+import { Contact } from "../lib/types";
 const name = ref("");
 const codeName = ref("");
 const phoneNumber = ref("");
