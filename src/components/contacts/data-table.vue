@@ -117,9 +117,12 @@ const reload = () => {
           </template>
           <template v-else-if="loadingStatus === 'finished'">
             <TableRow>
-              <TableCell :colspan="columns.length" class="h-24 text-center">
+              <TableCell v-if="data.length === 0" :colspan="columns.length" class="h-24 text-center">
                 Kontaktid puuduvad. Vajuta nuppu "Lisa kontakt", et lisada uus
                 kontakt.
+              </TableCell>
+              <TableCell v-else :colspan="columns.length" class="h-24 text-center">
+                Sellise filtriga kontakte ei leitud.
               </TableCell>
             </TableRow>
           </template>
